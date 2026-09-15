@@ -77,7 +77,7 @@ export default function AmpelPage() {
         <div
           className="flex shrink-0 flex-col gap-4 rounded-[2.5rem] p-5 sm:gap-6 sm:p-7"
           style={{
-            background: "color-mix(in srgb, var(--ink) 88%, transparent)",
+            background: "var(--ampel-gehaeuse)",
             boxShadow: "var(--shadow-lg)",
           }}
         >

@@ -170,6 +170,7 @@ input[type="range"] {
   --a-teal: #1f7f87;
   --a-red: #c23f36;
   --a-slate: #4a5670;
+  --ampel-gehaeuse: #1b2333;
 }
 
 [data-theme="dark"] {
@@ -180,6 +181,7 @@ input[type="range"] {
   --a-teal: #4bb6bd;
   --a-red: #e2675c;
   --a-slate: #93a3c0;
+  --ampel-gehaeuse: #05080f;
 }
 
 /* --- Drucken: Gruppen, Sitzpläne, Dienste und Notenschlüssel ---

@@ -1,5 +1,7 @@
 # LMG Classroom Tools
 
+**Live: <https://simon23-12.github.io/LMGTools/>**
+
 Werkzeuge für den Unterricht am Lessing-Gymnasium — Timer, Lautstärke-Ampel,
 Gruppeneinteilung, Sitzplan und mehr, im Corporate Design der Schule.
 
@@ -85,6 +87,22 @@ einsetzen — alles andere referenziert nur diese Komponente.
 npm run build
 ```
 
-Alle Seiten werden statisch vorgerendert. Das Ergebnis läuft auf Vercel im
-kostenlosen Bereich: keine Functions, kein Blob, keine Datenbank, nur
-ausgelieferte Dateien.
+`output: "export"` erzeugt nach `out/` reines HTML, CSS und JavaScript —
+keine Functions, keine Datenbank, nichts, was einen Node-Server bräuchte.
+
+### GitHub Pages
+
+Jeder Push auf `main` startet den Workflow in
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), der den
+Export baut und veröffentlicht. Es ist kein Handgriff nötig; im Actions-Tab
+lässt sich der Lauf auch von Hand auslösen.
+
+Weil die Seite unter `/LMGTools/` liegt und nicht in der Wurzel, braucht
+Next.js einen Basispfad. Der kommt aus `NEXT_PUBLIC_BASE_PATH` und wird im
+Workflow aus dem Repository-Namen gebildet — ein Umbenennen des Repositorys
+passt sich also von selbst an. Lokal ist die Variable leer, `npm run dev`
+läuft deshalb weiter unter `http://localhost:3000/`.
+
+Zwei Fälle, in denen der Basispfad **leer** sein muss: eine eigene Domain
+(CNAME) oder ein Repository mit dem Namen `simon23-12.github.io`. Dann in
+`.github/workflows/deploy.yml` die Zeile `NEXT_PUBLIC_BASE_PATH` entfernen.

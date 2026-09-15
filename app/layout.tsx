@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import { themeBootScript } from "@/components/Theme";
+
+// Auf GitHub Pages liegt alles unter /<Repository>/ — siehe next.config.ts.
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -23,7 +26,7 @@ export const metadata: Metadata = {
   description:
     "Werkzeuge für den Unterricht am LMG: Timer, Lautstärke-Ampel, Gruppeneinteilung, Sitzplan und mehr. Läuft komplett im Browser.",
   applicationName: "LMG Classroom Tools",
-  manifest: "/manifest.webmanifest",
+  manifest: `${basePath}/manifest.webmanifest`,
   appleWebApp: {
     capable: true,
     title: "LMG Tools",
