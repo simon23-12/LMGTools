@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LMG Classroom Tools
 
-## Getting Started
+Werkzeuge für den Unterricht am Lessing-Gymnasium — Timer, Lautstärke-Ampel,
+Gruppeneinteilung, Sitzplan und mehr, im Corporate Design der Schule.
 
-First, run the development server:
+**Alles läuft im Browser.** Kein Server, keine Datenbank, keine Anmeldung.
+Klassenlisten und Einstellungen liegen ausschließlich im `localStorage` des
+jeweiligen Geräts und werden nirgendwohin übertragen.
+
+## Loslegen
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Dann <http://localhost:3000> öffnen.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Die Werkzeuge
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route | Was es macht |
+| --- | --- |
+| `/timer` | Countdown und Stoppuhr, wahlweise als Ziffern, als schrumpfender Ring oder ganz ohne Zahlen. Gong am Ende, „+1 Min“ im Lauf. Vorbelegbar per URL: `/timer?min=5&look=ring` |
+| `/stundenuhr` | Zeigt die laufende Schulstunde und wie lange sie noch dauert. Stundenraster frei einstellbar |
+| `/stationen` | Rotation mit Gong und Wechselbildschirm. Vorlagen für Stationenlauf, Think–Pair–Share und Placemat |
+| `/ampel` | Lautstärke-Ampel. Misst den Raumpegel über das Mikrofon, Schwellen einstellbar, Ruhe-Punkte als Belohnung. Auch von Hand bedienbar |
+| `/phasen` | Großbild für die Sozialform samt Lautstärke- und Hilfe-Regel, dazu der Arbeitsauftrag |
+| `/gruppen` | Gruppeneinteilung nach Größe oder Anzahl — mit Anwesenheit, „diese zwei nicht zusammen“, Rollenverteilung und Gedächtnis für frühere Paarungen |
+| `/zufall` | Namen ziehen, wahlweise ohne Wiederholung, auch mehrere auf einmal |
+| `/anzeige` | Ein Satz, die ganze Wand. Schriftgröße passt sich der Textlänge an |
+| `/tafel` | Whiteboard mit Stift, Radierer, Raster und einer Abdeckung zum schrittweisen Aufdecken |
+| `/sitzplan` | Sitzplan per Antippen, zufällig verteilbar, pro Klasse gespeichert |
+| `/dienste` | Dienste rotieren automatisch nach Kalenderwoche |
+| `/noten` | Punkte zu Note für Oberstufe und Sek I, dazu der volle Punkteschlüssel zum Ausdrucken |
+| `/klassen` | Klassenlisten anlegen und pflegen, mit Export und Import als Datei |
 
-## Learn More
+## Bedienung vor der Klasse
 
-To learn more about Next.js, take a look at the following resources:
+- **Vollbild** über das Symbol oben rechts. Im Vollbild blendet sich die
+  Kopfzeile nach kurzer Ruhe aus, sodass nur noch das Werkzeug zu sehen ist.
+- **Tastatur:** `Leertaste` startet und pausiert, `R` setzt zurück, `1`–`4`
+  schalten die Arbeitsphase um, `/` springt auf der Startseite ins Suchfeld.
+- **Dunkles Design** über das Mond-Symbol — für abgedunkelte Räume.
+- Laufende Timer halten den Bildschirm wach (Wake Lock).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Aufbau
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+app/                 Eine Route je Werkzeug, alle statisch vorgerendert
+components/          ToolShell (Rahmen), UI-Bausteine, Icons, Logo
+lib/
+  tools.ts           Registry — hier stehen Name, Kategorie und Farbe
+  storage.ts         localStorage über useSyncExternalStore
+  classes.ts         Klassenlisten
+  grouping.ts        Gruppenalgorithmus mit Regeln und Historie
+  useMicLevel.ts     Pegelmessung fürs Mikrofon
+  hooks.ts           Uhr, Vollbild, Wake Lock, Tastenkürzel
+```
 
-## Deploy on Vercel
+Ein neues Werkzeug braucht zwei Dinge: einen Eintrag in `lib/tools.ts` und
+eine Seite unter `app/<slug>/page.tsx`, die den Inhalt in `<ToolShell>`
+verpackt. Startseite, Suche und Favoriten ziehen sich den Rest selbst.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Datenschutz
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Keine Schülerdaten auf einem Server — es gibt keinen.
+- In den Klassenlisten stehen nur Vornamen.
+- Die Ampel berechnet aus dem Mikrofonsignal ausschließlich die Lautstärke.
+  Es wird nichts aufgezeichnet, gespeichert oder gesendet.
+- Kein Tracking, keine Cookies, keine Einbindung von Drittanbietern.
+  Schriftarten werden beim Bauen mitgeliefert, nicht zur Laufzeit geladen.
+
+Weil alles im Browser bleibt: Ein anderer Rechner oder ein geleerter
+Browserspeicher bedeutet, dass die Listen weg sind. Unter `/klassen` gibt es
+dafür Export und Import als Datei.
+
+## Logo
+
+`components/Logo.tsx` enthält einen Nachbau des Signets aus zwei
+Sprechblasen. Liegt die offizielle Logodatei vor, lässt sie sich dort
+einsetzen — alles andere referenziert nur diese Komponente.
+
+## Bauen und Veröffentlichen
+
+```bash
+npm run build
+```
+
+Alle Seiten werden statisch vorgerendert. Das Ergebnis läuft auf Vercel im
+kostenlosen Bereich: keine Functions, kein Blob, keine Datenbank, nur
+ausgelieferte Dateien.

@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Ohne das sucht Turbopack die package-lock.json im Heimatverzeichnis
+  // und waehlt einen zu hohen Projekt-Root.
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 export default nextConfig;

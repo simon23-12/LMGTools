@@ -1,26 +1,230 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------------------------------------------------------------
+   LMG Corporate Design
+   Blau + Orange aus dem Schullogo (Sprechblasen-Motiv).
+   Alles ist auf Beamer-Lesbarkeit ausgelegt: hoher Kontrast,
+   grosse Typo, ruhige Flaechen.
+----------------------------------------------------------------- */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --lmg-blue: #2c5aa0;
+  --lmg-blue-deep: #1e3f73;
+  --lmg-blue-soft: #e8eff9;
+  --lmg-orange: #e9942c;
+  --lmg-orange-deep: #c2741a;
+  --lmg-orange-soft: #fdf0de;
+
+  --bg: #f5f7fa;
+  --bg-grain: #eef1f6;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --ink: #121a2e;
+  --ink-muted: #5c6880;
+  --line: #dfe4ec;
+  --line-strong: #c5cdda;
+
+  --ok: #2f8757;
+  --warn: #d99213;
+  --alert: #c23f36;
+
+  --shadow-sm: 0 1px 2px rgb(18 26 46 / 0.06), 0 2px 6px rgb(18 26 46 / 0.04);
+  --shadow-md: 0 2px 4px rgb(18 26 46 / 0.06), 0 12px 28px rgb(18 26 46 / 0.09);
+  --shadow-lg: 0 4px 8px rgb(18 26 46 / 0.08), 0 24px 56px rgb(18 26 46 / 0.14);
+}
+
+[data-theme="dark"] {
+  --lmg-blue: #6f9ede;
+  --lmg-blue-deep: #4c7ec4;
+  --lmg-blue-soft: #1b2942;
+  --lmg-orange: #f0a94b;
+  --lmg-orange-deep: #d38c2c;
+  --lmg-orange-soft: #33251180;
+
+  --bg: #0d1320;
+  --bg-grain: #111827;
+  --surface: #161f31;
+  --surface-2: #1c2740;
+  --ink: #edf2f9;
+  --ink-muted: #96a3ba;
+  --line: #27334c;
+  --line-strong: #38476a;
+
+  --ok: #4cb37b;
+  --warn: #eab34a;
+  --alert: #e2675c;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 2px 4px rgb(0 0 0 / 0.3), 0 12px 28px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 4px 8px rgb(0 0 0 / 0.35), 0 24px 56px rgb(0 0 0 / 0.55);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-blue: var(--lmg-blue);
+  --color-blue-deep: var(--lmg-blue-deep);
+  --color-blue-soft: var(--lmg-blue-soft);
+  --color-orange: var(--lmg-orange);
+  --color-orange-deep: var(--lmg-orange-deep);
+  --color-orange-soft: var(--lmg-orange-soft);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-alert: var(--alert);
+
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-bubble: 1.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--line);
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 12% -10%, color-mix(in srgb, var(--lmg-blue) 11%, transparent), transparent 60%),
+    radial-gradient(ellipse 70% 55% at 95% 0%, color-mix(in srgb, var(--lmg-orange) 12%, transparent), transparent 62%);
+  /* Kein background-attachment: fixed — das erzwingt beim Scrollen
+     ein Neuzeichnen der ganzen Flaeche und ruckelt auf schwacher
+     Hardware, wie sie in Klassenraeumen steht. */
+  background-repeat: no-repeat;
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Beamer-Modus: wenn ein Tool im Vollbild praesentiert wird,
+   verschwindet jede Dekoration. */
+body:has([data-stage="on"]) {
+  background-image: none;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Zahlen im Timer duerfen nicht springen */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--lmg-orange) 32%, transparent);
+}
+
+:focus-visible {
+  outline: 3px solid var(--lmg-orange);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+input[type="range"] {
+  accent-color: var(--lmg-blue);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Scrollbar dezent halten */
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar { width: 11px; height: 11px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--line-strong);
+    border-radius: 99px;
+    border: 3px solid var(--bg);
+  }
+}
+
+/* --- Akzentfarben der einzelnen Tools -------------------------- */
+:root {
+  --a-blue: #2c5aa0;
+  --a-orange: #d9822b;
+  --a-green: #2f8757;
+  --a-violet: #6b57a8;
+  --a-teal: #1f7f87;
+  --a-red: #c23f36;
+  --a-slate: #4a5670;
+}
+
+[data-theme="dark"] {
+  --a-blue: #74a2e0;
+  --a-orange: #f0a94b;
+  --a-green: #4fb87f;
+  --a-violet: #a291e0;
+  --a-teal: #4bb6bd;
+  --a-red: #e2675c;
+  --a-slate: #93a3c0;
+}
+
+/* --- Drucken: Gruppen, Sitzpläne, Dienste und Notenschlüssel ---
+   Es soll das Ergebnis aufs Papier, nicht die Bedienoberfläche.      */
+@media print {
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #ffffff;
+    --ink: #000000;
+    --ink-muted: #444444;
+    --line: #bbbbbb;
+    --line-strong: #999999;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+  }
+
+  body {
+    background: #fff !important;
+    background-image: none !important;
+  }
+
+  header,
+  footer,
+  nav,
+  button,
+  select,
+  input[type="range"] {
+    display: none !important;
+  }
+
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  article,
+  section,
+  table {
+    break-inside: avoid;
+    box-shadow: none !important;
+  }
+
+  a[href]::after {
+    content: "";
+  }
 }
