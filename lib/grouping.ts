@@ -121,12 +121,20 @@ export function recordHistory(
   return next;
 }
 
-export const ROLES = [
-  "Zeitwächter:in",
-  "Schriftführer:in",
-  "Präsentator:in",
-  "Materialholer:in",
-  "Ruhewächter:in",
+export type Rolle = {
+  id: string;
+  name: string;
+  /** Nur angehakte Rollen werden verteilt. */
+  aktiv: boolean;
+};
+
+/** Vorschlag zum Loslegen — die Liste ist vollstaendig editierbar. */
+export const STANDARD_ROLLEN: Rolle[] = [
+  { id: "zeit", name: "Zeitwächter:in", aktiv: true },
+  { id: "schrift", name: "Schriftführer:in", aktiv: true },
+  { id: "praesentation", name: "Präsentator:in", aktiv: true },
+  { id: "material", name: "Materialholer:in", aktiv: false },
+  { id: "ruhe", name: "Ruhewächter:in", aktiv: false },
 ];
 
 /** Gruppennamen, die auf dem Beamer aus acht Metern lesbar sind. */

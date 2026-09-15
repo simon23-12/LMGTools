@@ -3,17 +3,20 @@
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { ToolShell } from "@/components/ToolShell";
+import { Anwesenheit } from "@/components/Anwesenheit";
 import { ClassPicker, useRoster } from "@/components/ClassPicker";
 import { Icon } from "@/components/Icons";
 import { Button, EmptyState, Panel, Segmented, Stepper } from "@/components/ui";
 import { useStored } from "@/lib/storage";
+import { newId } from "@/lib/classes";
 import {
-  ROLES,
+  STANDARD_ROLLEN,
   buildGroups,
   groupLabel,
   pairKey,
   recordHistory,
   type PairCounts,
+  type Rolle,
 } from "@/lib/grouping";
 
 type Basis = "anzahl" | "groesse";
@@ -36,6 +39,12 @@ export default function GruppenPage() {
   const [groupSize, setGroupSize] = useState(4);
   const [groupCount, setGroupCount] = useState(5);
   const [withRoles, setWithRoles] = useState(false);
+  /* Rollen gelten klassenuebergreifend — sie haengen an der Methode,
+     nicht an der Lerngruppe. */
+  const [rollen, setRollen] = useStored<Rolle[]>(
+    "gruppen.rollen",
+    STANDARD_ROLLEN,
+  );
   const [absent, setAbsent] = useState<string[]>([]);
   const [showSetup, setShowSetup] = useState(true);
   const [groups, setGroups] = useState<string[][]>([]);
@@ -65,6 +74,12 @@ export default function GruppenPage() {
   const present = useMemo(
     () => names.filter((n) => !absent.includes(n)),
     [names, absent],
+  );
+
+  /* Die Reihenfolge der Liste bestimmt, wer welche Rolle bekommt. */
+  const aktiveRollen = useMemo(
+    () => rollen.filter((r) => r.aktiv),
+    [rollen],
   );
 
   const generate = useCallback(() => {
@@ -172,14 +187,27 @@ export default function GruppenPage() {
         <button
           type="button"
           onClick={() => setWithRoles((r) => !r)}
-          className={`h-11 rounded-xl border px-4 text-[0.9rem] font-medium transition ${
-            withRoles
+          disabled={aktiveRollen.length === 0}
+          title={
+            aktiveRollen.length === 0
+              ? "Erst unten mindestens eine Rolle auswählen"
+              : undefined
+          }
+          className={`h-11 rounded-xl border px-4 text-[0.9rem] font-medium transition disabled:opacity-40 ${
+            withRoles && aktiveRollen.length > 0
               ? "border-transparent text-white"
               : "border-line text-muted hover:text-ink"
           }`}
-          style={withRoles ? { background: "var(--a-orange)" } : undefined}
+          style={
+            withRoles && aktiveRollen.length > 0
+              ? { background: "var(--a-orange)" }
+              : undefined
+          }
         >
           Rollen verteilen
+          {aktiveRollen.length > 0 ? (
+            <span className="ml-1.5 opacity-70">({aktiveRollen.length})</span>
+          ) : null}
         </button>
 
         <Button
@@ -194,66 +222,27 @@ export default function GruppenPage() {
       {/* ---------- Anwesenheit und Regeln ---------- */}
       {showSetup ? (
         <div className="mb-7 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-          <Panel
-            title="Wer ist heute da?"
-            action={
-              absent.length > 0 ? (
-                <button
-                  type="button"
-                  onClick={() => setAbsent([])}
-                  className="text-sm font-medium text-muted hover:text-ink"
-                >
-                  Alle zurücksetzen
-                </button>
-              ) : (
-                <span className="text-sm text-muted">
-                  Namen antippen = fehlt
-                </span>
-              )
-            }
-          >
-            <div className="flex flex-wrap gap-2 p-5">
-              {names.map((name) => {
-                const isAbsent = absent.includes(name);
-                return (
-                  <button
-                    key={name}
-                    type="button"
-                    onClick={() => toggleAbsent(name)}
-                    className={`h-9 rounded-lg border px-3 text-[0.9rem] font-medium transition ${
-                      isAbsent
-                        ? "border-line bg-surface-2 text-muted line-through opacity-60"
-                        : "border-transparent"
-                    }`}
-                    style={
-                      isAbsent
-                        ? undefined
-                        : {
-                            background:
-                              "color-mix(in srgb, var(--lmg-blue) 12%, transparent)",
-                            color: "var(--lmg-blue)",
-                          }
-                    }
-                  >
-                    {name}
-                  </button>
-                );
-              })}
-              {names.length === 0 ? (
-                <p className="py-4 text-muted">
-                  Diese Klasse hat noch keine Namen.
-                </p>
-              ) : null}
-            </div>
-          </Panel>
-
-          <BlockedPairsPanel
+          <Anwesenheit
             names={names}
-            blockedPairs={blockedPairs}
-            onChange={setBlockedPairs}
-            historySize={Object.keys(history).length}
-            onClearHistory={() => setHistory({})}
+            absent={absent}
+            onToggle={toggleAbsent}
+            onReset={() => setAbsent([])}
           />
+
+          <div className="space-y-4">
+            <RollenPanel
+              rollen={rollen}
+              onChange={setRollen}
+              onAktivieren={() => setWithRoles(true)}
+            />
+            <BlockedPairsPanel
+              names={names}
+              blockedPairs={blockedPairs}
+              onChange={setBlockedPairs}
+              historySize={Object.keys(history).length}
+              onClearHistory={() => setHistory({})}
+            />
+          </div>
         </div>
       ) : null}
 
@@ -317,9 +306,9 @@ export default function GruppenPage() {
                     <span className="font-display text-[1.1rem] font-semibold">
                       {name}
                     </span>
-                    {withRoles && j < ROLES.length ? (
+                    {withRoles && j < aktiveRollen.length ? (
                       <span className="shrink-0 text-[0.78rem] font-medium text-muted">
-                        {ROLES[j]}
+                        {aktiveRollen[j].name}
                       </span>
                     ) : null}
                   </li>
@@ -460,6 +449,172 @@ function BlockedPairsPanel({
             </button>
           ) : null}
         </div>
+      </div>
+    </Panel>
+  );
+}
+
+/**
+ * Eigene Rollen anlegen und auswaehlen. Die Reihenfolge entscheidet,
+ * wer in der Gruppe welche Rolle bekommt: die erste aktive Rolle geht
+ * an das erste Mitglied und so weiter.
+ */
+function RollenPanel({
+  rollen,
+  onChange,
+  onAktivieren,
+}: {
+  rollen: Rolle[];
+  onChange: (next: Rolle[]) => void;
+  onAktivieren: () => void;
+}) {
+  const [entwurf, setEntwurf] = useState("");
+  const aktive = rollen.filter((r) => r.aktiv).length;
+
+  function hinzufuegen(e: React.FormEvent) {
+    e.preventDefault();
+    const name = entwurf.trim();
+    if (!name) return;
+    onChange([...rollen, { id: newId(), name, aktiv: true }]);
+    setEntwurf("");
+    onAktivieren();
+  }
+
+  function umschalten(id: string) {
+    const next = rollen.map((r) =>
+      r.id === id ? { ...r, aktiv: !r.aktiv } : r,
+    );
+    onChange(next);
+    if (next.some((r) => r.aktiv)) onAktivieren();
+  }
+
+  function verschieben(index: number, richtung: -1 | 1) {
+    const ziel = index + richtung;
+    if (ziel < 0 || ziel >= rollen.length) return;
+    const next = [...rollen];
+    [next[index], next[ziel]] = [next[ziel], next[index]];
+    onChange(next);
+  }
+
+  return (
+    <Panel
+      title="Rollen"
+      action={
+        <button
+          type="button"
+          onClick={() => onChange(STANDARD_ROLLEN)}
+          className="text-sm font-medium text-muted hover:text-ink"
+        >
+          Vorschlag
+        </button>
+      }
+    >
+      <div className="space-y-4 p-5">
+        <ul className="space-y-1.5">
+          {rollen.map((rolle, i) => (
+            <li key={rolle.id} className="flex items-center gap-1.5">
+              <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5">
+                <input
+                  type="checkbox"
+                  checked={rolle.aktiv}
+                  onChange={() => umschalten(rolle.id)}
+                  className="size-4 shrink-0 accent-[var(--a-orange)]"
+                  aria-label={`${rolle.name} verteilen`}
+                />
+                <span
+                  className="grid size-6 shrink-0 place-items-center rounded-md text-[0.7rem] font-bold"
+                  style={
+                    rolle.aktiv
+                      ? {
+                          background:
+                            "color-mix(in srgb, var(--a-orange) 16%, transparent)",
+                          color: "var(--a-orange)",
+                        }
+                      : { background: "var(--surface-2)", color: "var(--ink-muted)" }
+                  }
+                  title={
+                    rolle.aktiv
+                      ? `Geht an Mitglied ${rollen.filter((r, j) => r.aktiv && j < i).length + 1} der Gruppe`
+                      : "Nicht aktiv"
+                  }
+                >
+                  {rolle.aktiv
+                    ? rollen.filter((r, j) => r.aktiv && j < i).length + 1
+                    : "–"}
+                </span>
+                <input
+                  value={rolle.name}
+                  onChange={(e) =>
+                    onChange(
+                      rollen.map((r) =>
+                        r.id === rolle.id ? { ...r, name: e.target.value } : r,
+                      ),
+                    )
+                  }
+                  className={`h-9 min-w-0 flex-1 rounded-lg bg-transparent px-1.5 text-[0.9rem] outline-none focus:bg-surface-2 ${
+                    rolle.aktiv ? "font-medium text-ink" : "text-muted"
+                  }`}
+                  aria-label={`Bezeichnung der Rolle ${rolle.name}`}
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => verschieben(i, -1)}
+                disabled={i === 0}
+                className="grid size-7 shrink-0 place-items-center rounded text-muted transition hover:bg-surface-2 hover:text-ink disabled:opacity-25"
+                aria-label={`${rolle.name} nach oben`}
+                title="Nach oben"
+              >
+                <Icon name="back" size={13} className="rotate-90" />
+              </button>
+              <button
+                type="button"
+                onClick={() => verschieben(i, 1)}
+                disabled={i === rollen.length - 1}
+                className="grid size-7 shrink-0 place-items-center rounded text-muted transition hover:bg-surface-2 hover:text-ink disabled:opacity-25"
+                aria-label={`${rolle.name} nach unten`}
+                title="Nach unten"
+              >
+                <Icon name="back" size={13} className="-rotate-90" />
+              </button>
+              <button
+                type="button"
+                onClick={() => onChange(rollen.filter((r) => r.id !== rolle.id))}
+                className="grid size-7 shrink-0 place-items-center rounded text-muted transition hover:bg-surface-2 hover:text-ink"
+                aria-label={`${rolle.name} löschen`}
+                title="Rolle löschen"
+              >
+                <Icon name="x" size={14} />
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <form onSubmit={hinzufuegen} className="flex gap-2">
+          <input
+            value={entwurf}
+            onChange={(e) => setEntwurf(e.target.value)}
+            placeholder="Eigene Rolle, z. B. Advocatus Diaboli"
+            className="h-10 min-w-0 flex-1 rounded-lg border border-line bg-surface-2 px-3 text-[0.9rem] outline-none"
+            aria-label="Neue Rolle"
+          />
+          <Button
+            type="submit"
+            size="sm"
+            variant="soft"
+            icon="plus"
+            disabled={!entwurf.trim()}
+            className="shrink-0"
+          >
+            <span className="sr-only">Rolle hinzufügen</span>
+          </Button>
+        </form>
+
+        <p className="border-t border-line pt-3 text-[0.85rem] leading-relaxed text-muted">
+          {aktive === 0
+            ? "Keine Rolle ausgewählt — es werden nur Namen verteilt."
+            : `Die ${aktive} angehakten Rollen gehen der Reihe nach an die Gruppenmitglieder. Bleiben Mitglieder übrig, gehen sie leer aus.`}
+        </p>
       </div>
     </Panel>
   );

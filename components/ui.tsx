@@ -152,7 +152,7 @@ export function TextInput({
   );
 }
 
-export function Segmented<T extends string>({
+export function Segmented<T extends string | number>({
   options,
   value,
   onChange,

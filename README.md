@@ -26,14 +26,23 @@ Dann <http://localhost:3000> öffnen.
 | `/stationen` | Rotation mit Gong und Wechselbildschirm. Vorlagen für Stationenlauf, Think–Pair–Share und Placemat |
 | `/ampel` | Lautstärke-Ampel. Misst den Raumpegel über das Mikrofon, Schwellen einstellbar, Ruhe-Punkte als Belohnung. Auch von Hand bedienbar |
 | `/phasen` | Großbild für die Sozialform samt Lautstärke- und Hilfe-Regel, dazu der Arbeitsauftrag |
-| `/gruppen` | Gruppeneinteilung nach Größe oder Anzahl — mit Anwesenheit, „diese zwei nicht zusammen“, Rollenverteilung und Gedächtnis für frühere Paarungen |
-| `/zufall` | Namen ziehen, wahlweise ohne Wiederholung, auch mehrere auf einmal |
+| `/gruppen` | Gruppeneinteilung nach Größe oder Anzahl — mit Anwesenheit, „diese zwei nicht zusammen“, frei anlegbaren Rollen und Gedächtnis für frühere Paarungen |
+| `/mingle` | Gesprächsrunden zu zweit, dritt oder viert. Nach Ablauf der Zeit gongt es und alle gleiten in eine neue Zusammenstellung |
+| `/zufall` | Namen ziehen — als Schnelldurchlauf oder am Glücksrad, wahlweise ohne Wiederholung |
 | `/anzeige` | Ein Satz, die ganze Wand. Schriftgröße passt sich der Textlänge an |
 | `/tafel` | Whiteboard mit Stift, Radierer, Raster und einer Abdeckung zum schrittweisen Aufdecken |
 | `/sitzplan` | Sitzplan per Antippen, zufällig verteilbar, pro Klasse gespeichert |
 | `/dienste` | Dienste rotieren automatisch nach Kalenderwoche |
 | `/noten` | Punkte zu Note für Oberstufe und Sek I, dazu der volle Punkteschlüssel zum Ausdrucken |
 | `/klassen` | Klassenlisten anlegen und pflegen, mit Export und Import als Datei |
+
+### Rollen in der Gruppenarbeit
+
+Unter `/gruppen` lässt sich eine eigene Rollenliste pflegen: anlegen,
+umbenennen, löschen, per Haken aktivieren und in der Reihenfolge verschieben.
+Die Reihenfolge entscheidet, wer welche Rolle bekommt — die erste aktive
+Rolle geht an das erste Gruppenmitglied. Sind weniger Rollen aktiv als
+Mitglieder da sind, gehen die übrigen leer aus.
 
 ## Bedienung vor der Klasse
 

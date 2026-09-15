@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 /** Vollbild fuer den Beamer. Fehler werden bewusst geschluckt —
  *  wenn der Browser es verweigert, laeuft das Tool trotzdem. */
@@ -181,4 +187,27 @@ export function formatClock(totalSeconds: number): string {
   const sec = s % 60;
   const two = (n: number) => String(n).padStart(2, "0");
   return h > 0 ? `${h}:${two(m)}:${two(sec)}` : `${two(m)}:${two(sec)}`;
+}
+
+/**
+ * Misst ein Element fortlaufend. Mingle rechnet daraus die Zielpunkte
+ * der Namensschilder aus — die muessen in Pixeln vorliegen, damit die
+ * Gleitbewegung ueber `transform` laeuft und nicht ruckelt.
+ */
+export function useElementSize<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const beobachter = new ResizeObserver((eintraege) => {
+      const box = eintraege[0]?.contentRect;
+      if (box) setSize({ width: box.width, height: box.height });
+    });
+    beobachter.observe(element);
+    return () => beobachter.disconnect();
+  }, []);
+
+  return [ref, size] as const;
 }

@@ -63,6 +63,14 @@ export const TOOLS: Tool[] = [
     icon: "groups",
   },
   {
+    slug: "mingle",
+    name: "Mingle",
+    tagline: "Neue Gesprächspartner im Minutentakt",
+    category: "Klasse",
+    accent: "var(--a-pink)",
+    icon: "mingle",
+  },
+  {
     slug: "zufall",
     name: "Wer ist dran?",
     tagline: "Namen ziehen, ohne Wiederholung",
