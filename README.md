@@ -27,7 +27,7 @@ Dann <http://localhost:3000> öffnen.
 | `/ampel` | Lautstärke-Ampel. Misst den Raumpegel über das Mikrofon, Schwellen einstellbar, Ruhe-Punkte als Belohnung. Auch von Hand bedienbar |
 | `/phasen` | Großbild für die Sozialform samt Lautstärke- und Hilfe-Regel, dazu der Arbeitsauftrag |
 | `/gruppen` | Gruppeneinteilung nach Größe oder Anzahl — mit Anwesenheit, „diese zwei nicht zusammen“, frei anlegbaren Rollen und Gedächtnis für frühere Paarungen |
-| `/mingle` | Gesprächsrunden zu zweit, dritt oder viert. Nach Ablauf der Zeit gongt es und alle gleiten in eine neue Zusammenstellung |
+| `/mingle` | Gesprächsrunden zu zweit, dritt oder viert. Nach Ablauf der Zeit gongt es und alle gleiten in eine neue Zusammenstellung. Über „Abwesend“ bleiben Fehlende außen vor |
 | `/zufall` | Namen ziehen — als Schnelldurchlauf oder am Glücksrad, wahlweise ohne Wiederholung |
 | `/anzeige` | Ein Satz, die ganze Wand. Schriftgröße passt sich der Textlänge an |
 | `/tafel` | Whiteboard mit Stift, Radierer, Raster und einer Abdeckung zum schrittweisen Aufdecken |

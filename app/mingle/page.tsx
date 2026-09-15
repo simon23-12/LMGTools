@@ -142,12 +142,23 @@ export default function MinglePage() {
     r: beenden,
   });
 
-  /* ---- Zielpunkte der Namensschilder ---- */
-  const { plaetze, inseln } = useMemo(() => {
+  /* ---- Zielpunkte der Namensschilder ----
+     Die Schriftgroesse folgt dem verfuegbaren Platz und dem laengsten
+     Namen, nicht der Anzahl der Leute. Innerhalb einer Insel stehen die
+     Namen untereinander — nebeneinander kollidieren lange Namen sonst
+     unweigerlich, sobald die Zellen schmal werden. */
+  const { plaetze, inseln, schriftPx, chipMax } = useMemo(() => {
     const plaetze = new Map<string, { x: number; y: number; farbe: string }>();
-    const inseln: { x: number; y: number; r: number; farbe: string }[] = [];
+    const inseln: {
+      x: number;
+      y: number;
+      breite: number;
+      hoehe: number;
+      farbe: string;
+    }[] = [];
+
     if (!buehne.width || !buehne.height || gruppen.length === 0) {
-      return { plaetze, inseln };
+      return { plaetze, inseln, schriftPx: 16, chipMax: 160 };
     }
 
     // Raster, das dem Seitenverhältnis der Bühne folgt
@@ -162,35 +173,44 @@ export default function MinglePage() {
     const zellB = buehne.width / spalten;
     const zellH = buehne.height / zeilen;
 
+    const laengster = Math.max(4, ...gruppen.flat().map((n) => n.length));
+    const groesste = Math.max(...gruppen.map((g) => g.length));
+
+    /* 0.56 em ist die mittlere Zeichenbreite der fetten Hausschrift,
+       dazu der Innenabstand des Schildchens. */
+    const maxInselB = zellB * 0.9;
+    const nachBreite = (maxInselB - 8) / (laengster * 0.56 + 1.8);
+    const nachHoehe = (zellH * 0.88) / (groesste * 2.05 + 1.1);
+    const schriftPx = Math.max(10, Math.min(26, nachBreite, nachHoehe));
+    const zeilenH = schriftPx * 2.05;
+
     gruppen.forEach((gruppe, gi) => {
       const spalte = gi % spalten;
       const zeile = Math.floor(gi / spalten);
       const mx = (spalte + 0.5) * zellB;
       const my = (zeile + 0.5) * zellH;
-      const radius = Math.min(zellB, zellH) * (gruppe.length <= 2 ? 0.2 : 0.27);
+
+      // Insel umschliesst ihren eigenen Inhalt, statt starr gleich gross zu sein
+      const laengsterHier = Math.max(4, ...gruppe.map((n) => n.length));
+      const breite = Math.min(
+        maxInselB,
+        laengsterHier * 0.56 * schriftPx + schriftPx * 2.8,
+      );
+      const hoehe = gruppe.length * zeilenH + schriftPx * 1.1;
       const farbe = FARBEN[gi % FARBEN.length];
 
-      inseln.push({
-        x: mx,
-        y: my,
-        r: radius + Math.min(zellB, zellH) * 0.17,
-        farbe,
-      });
+      inseln.push({ x: mx, y: my, breite, hoehe, farbe });
 
-      // Paare nebeneinander, größere Gruppen im Kreis
-      const start = gruppe.length <= 2 ? 180 : -90;
       gruppe.forEach((name, i) => {
-        const winkel =
-          ((start + (360 / gruppe.length) * i) * Math.PI) / 180;
         plaetze.set(name, {
-          x: mx + radius * Math.cos(winkel),
-          y: my + radius * Math.sin(winkel),
+          x: mx,
+          y: my - hoehe / 2 + schriftPx * 0.55 + (i + 0.5) * zeilenH,
           farbe,
         });
       });
     });
 
-    return { plaetze, inseln };
+    return { plaetze, inseln, schriftPx, chipMax: maxInselB - 10 };
   }, [gruppen, buehne]);
 
   const fortschritt = dauerMs > 0 ? 1 - restMs / dauerMs : 0;
@@ -273,15 +293,17 @@ export default function MinglePage() {
             {inseln.map((insel, i) => (
               <span
                 key={i}
-                className="pointer-events-none absolute rounded-full"
+                className="pointer-events-none absolute"
                 style={{
                   left: 0,
                   top: 0,
-                  width: insel.r * 2,
-                  height: insel.r * 2,
+                  width: insel.breite,
+                  height: insel.hoehe,
+                  borderRadius: Math.min(insel.breite, insel.hoehe) * 0.34,
                   transform: `translate(${insel.x}px, ${insel.y}px) translate(-50%, -50%)`,
                   background: `color-mix(in srgb, ${insel.farbe} 10%, transparent)`,
                   border: `1px solid color-mix(in srgb, ${insel.farbe} 22%, transparent)`,
+                  transition: "width 1.15s, height 1.15s, border-radius 1.15s",
                 }}
               />
             ))}
@@ -292,14 +314,18 @@ export default function MinglePage() {
               return (
                 <span
                   key={name}
-                  className="absolute top-0 left-0 rounded-xl px-3 py-1.5 font-display font-bold whitespace-nowrap shadow-[var(--shadow-sm)]"
+                  className="absolute top-0 left-0 overflow-hidden font-display font-bold text-ellipsis whitespace-nowrap shadow-[var(--shadow-sm)]"
                   style={{
                     transform: `translate(${platz.x}px, ${platz.y}px) translate(-50%, -50%)`,
                     transition:
                       "transform 1.15s cubic-bezier(0.34, 0.8, 0.28, 1), background-color 1.15s, color 1.15s",
                     background: `color-mix(in srgb, ${platz.farbe} 17%, var(--surface))`,
                     color: platz.farbe,
-                    fontSize: `clamp(0.85rem, ${Math.max(0.9, 2.6 - anwesend.length * 0.045)}vw, 1.6rem)`,
+                    fontSize: schriftPx,
+                    lineHeight: 1.25,
+                    padding: `${schriftPx * 0.2}px ${schriftPx * 0.55}px`,
+                    borderRadius: schriftPx * 0.5,
+                    maxWidth: chipMax,
                   }}
                 >
                   {name}
@@ -366,11 +392,15 @@ export default function MinglePage() {
           />
 
           <Button
-            variant="ghost"
+            variant={absent.length > 0 ? "soft" : "ghost"}
             icon="people"
             onClick={() => setZeigeListe((z) => !z)}
+            title="Wer heute fehlt, wird nicht eingeteilt"
           >
-            {anwesend.length} von {names.length} da
+            Abwesend
+            <span className="opacity-70">
+              {absent.length > 0 ? `(${absent.length})` : `· ${names.length} da`}
+            </span>
           </Button>
 
           {runde > 0 ? (
