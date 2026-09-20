@@ -71,6 +71,14 @@ export const TOOLS: Tool[] = [
     icon: "mingle",
   },
   {
+    slug: "vocab-battle",
+    name: "Vocab Battle",
+    tagline: "Zwei Partner, getrennte Wortlisten, eine Uhr",
+    category: "Klasse",
+    accent: "var(--a-red)",
+    icon: "swords",
+  },
+  {
     slug: "zufall",
     name: "Wer ist dran?",
     tagline: "Namen ziehen, ohne Wiederholung",

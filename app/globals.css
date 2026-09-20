@@ -232,3 +232,26 @@ input[type="range"] {
     content: "";
   }
 }
+
+/* --- Vocab Battle: Vorspann und Wortwechsel -------------------- */
+@keyframes battle-title {
+  from { opacity: 0; letter-spacing: 0.35em; filter: blur(10px); }
+  to   { opacity: 1; letter-spacing: -0.02em; filter: none; }
+}
+.battle-title { animation: battle-title 1.3s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+
+/* Die Zahl bleibt bis zum Wechsel stehen — sie darf auf der Leinwand
+   nicht zwischendurch verschwinden, auch nicht bei reduzierter
+   Bewegung, wo nur der Endzustand uebrig bleibt. */
+@keyframes battle-count {
+  0%   { opacity: 0; transform: scale(1.75); }
+  30%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 1; transform: scale(0.94); }
+}
+.battle-count { animation: battle-count 0.9s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+
+@keyframes battle-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+.battle-in { animation: battle-in 0.45s cubic-bezier(0.2, 0.8, 0.3, 1) both; }

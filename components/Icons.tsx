@@ -226,6 +226,19 @@ const PATHS: Record<string, React.ReactNode> = {
       <path d="M18.2 6.5a7.75 7.75 0 0 1 0 11" />
     </>
   ),
+  swords: (
+    <>
+      {/* Zwei gekreuzte Klingen mit Parierstange und Griff */}
+      <path d="M4 4.25V6l10.4 10.4" />
+      <path d="M4 4.25h1.75L16.15 14.6" />
+      <path d="m13.9 17.2 3.4-3.4" />
+      <path d="m16.6 16.6 3.15 3.15" />
+      <path d="M20 4.25V6L9.6 16.4" />
+      <path d="M20 4.25h-1.75L7.85 14.6" />
+      <path d="m10.1 17.2-3.4-3.4" />
+      <path d="m7.4 16.6-3.15 3.15" />
+    </>
+  ),
   external: (
     <>
       <path d="M13.5 4.25h6.25v6.25" />
