@@ -10,7 +10,9 @@ import { useStored } from "@/lib/storage";
 import {
   CATEGORY_BLURB,
   CATEGORY_ORDER,
+  LINKS,
   TOOLS,
+  type ExternalLink,
   type Tool,
 } from "@/lib/tools";
 
@@ -31,6 +33,15 @@ export default function Home() {
         t.name.toLowerCase().includes(q) ||
         t.tagline.toLowerCase().includes(q) ||
         t.category.toLowerCase().includes(q),
+    );
+  }, [query]);
+
+  const linkMatches = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return LINKS;
+    return LINKS.filter(
+      (l) =>
+        l.name.toLowerCase().includes(q) || l.tagline.toLowerCase().includes(q),
     );
   }, [query]);
 
@@ -66,18 +77,13 @@ export default function Home() {
           className="mb-3 text-[0.8rem] font-bold tracking-[0.14em] uppercase"
           style={{ color: "var(--lmg-orange)" }}
         >
-          Lessing-Gymnasium
+          Leibniz-Montessori-Gymnasium Düsseldorf
         </p>
         <h1 className="max-w-3xl font-display text-[2.6rem] leading-[1.05] font-extrabold tracking-tight sm:text-6xl">
           Werkzeuge für
           <br />
           <span style={{ color: "var(--lmg-blue)" }}>den Unterricht.</span>
         </h1>
-        <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted">
-          Timer, Ampel, Gruppen, Sitzplan — auf den Beamer gedacht, in einem
-          Klick offen. Ohne Anmeldung, ohne Server, ohne Schülerdaten im Netz.
-        </p>
-
         <div className="mt-8 flex max-w-md items-center gap-2.5 rounded-2xl border border-line bg-surface px-4 shadow-[var(--shadow-sm)] focus-within:border-transparent focus-within:ring-2 focus-within:ring-[var(--lmg-blue)]">
           <Icon name="search" size={19} className="shrink-0 text-muted" />
           <input
@@ -118,29 +124,43 @@ export default function Home() {
 
       {/* ---------------- Kacheln ---------------- */}
       {searching ? (
-        matches.length > 0 ? (
-          <Group
-            title={`${matches.length} Treffer`}
-            tools={matches}
-            favorites={favorites}
-            onToggleFavorite={toggleFavorite}
-          />
+        matches.length + linkMatches.length > 0 ? (
+          <>
+            {matches.length > 0 ? (
+              <Group
+                title={`${matches.length} Treffer`}
+                tools={matches}
+                favorites={favorites}
+                onToggleFavorite={toggleFavorite}
+              />
+            ) : null}
+            {linkMatches.length > 0 ? (
+              <LinkGroup title="Links" links={linkMatches} />
+            ) : null}
+          </>
         ) : (
           <p className="py-16 text-center text-muted">
             Nichts gefunden für „{query}“.
           </p>
         )
       ) : (
-        CATEGORY_ORDER.map((cat) => (
-          <Group
-            key={cat}
-            title={cat}
-            blurb={CATEGORY_BLURB[cat]}
-            tools={TOOLS.filter((t) => t.category === cat)}
-            favorites={favorites}
-            onToggleFavorite={toggleFavorite}
+        <>
+          {CATEGORY_ORDER.map((cat) => (
+            <Group
+              key={cat}
+              title={cat}
+              blurb={CATEGORY_BLURB[cat]}
+              tools={TOOLS.filter((t) => t.category === cat)}
+              favorites={favorites}
+              onToggleFavorite={toggleFavorite}
+            />
+          ))}
+          <LinkGroup
+            title="Links"
+            blurb="Eigene Anwendungen, öffnen in neuem Tab"
+            links={LINKS}
           />
-        ))
+        </>
       )}
 
       <footer className="mt-20 border-t border-line pt-8 pb-4">
@@ -154,11 +174,70 @@ export default function Home() {
             keine Übertragung an Dritte.
           </p>
           <p className="text-sm text-muted">
-            Für das Kollegium des Lessing-Gymnasiums.
+            Für das Kollegium des Leibniz-Montessori-Gymnasiums Düsseldorf.
           </p>
         </div>
       </footer>
     </div>
+  );
+}
+
+function LinkGroup({
+  title,
+  blurb,
+  links,
+}: {
+  title: string;
+  blurb?: string;
+  links: ExternalLink[];
+}) {
+  return (
+    <section className="mb-12">
+      <div className="mb-4 flex items-baseline gap-3">
+        <h2 className="font-display text-xl font-bold">{title}</h2>
+        {blurb ? <span className="text-sm text-muted">{blurb}</span> : null}
+      </div>
+      <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+        {links.map((link) => (
+          <LinkCard key={link.url} link={link} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function LinkCard({ link }: { link: ExternalLink }) {
+  return (
+    <a
+      href={link.url}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="group flex h-full items-start gap-4 rounded-2xl border border-line bg-surface p-5 shadow-[var(--shadow-sm)] transition duration-200 hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--tool-accent)_45%,transparent)] hover:shadow-[var(--shadow-md)]"
+      style={{ ["--tool-accent" as string]: link.accent }}
+    >
+      <span
+        className="grid size-12 shrink-0 place-items-center rounded-[1.15rem] rounded-bl-[0.4rem] transition group-hover:scale-105"
+        style={{
+          background: `color-mix(in srgb, ${link.accent} 14%, transparent)`,
+          color: link.accent,
+        }}
+      >
+        <Icon name={link.icon} size={24} />
+      </span>
+      <span className="min-w-0 flex-1 pt-0.5">
+        <span className="block font-display text-[1.05rem] leading-tight font-bold">
+          {link.name}
+        </span>
+        <span className="mt-1 block text-[0.9rem] leading-snug text-muted">
+          {link.tagline}
+        </span>
+      </span>
+      <Icon
+        name="external"
+        size={16}
+        className="mt-1 shrink-0 text-muted transition group-hover:text-ink"
+      />
+    </a>
   );
 }
 

@@ -145,3 +145,53 @@ export const CATEGORY_BLURB: Record<ToolCategory, string> = {
 export function toolBySlug(slug: string): Tool | undefined {
   return TOOLS.find((t) => t.slug === slug);
 }
+
+export type ExternalLink = {
+  url: string;
+  name: string;
+  tagline: string;
+  accent: string;
+  icon: string;
+};
+
+/**
+ * Eigene Web-Anwendungen ausserhalb dieser Seite. Sie liegen auf
+ * fremden Servern und oeffnen deshalb bewusst in einem neuen Tab.
+ */
+export const LINKS: ExternalLink[] = [
+  {
+    url: "https://youtube-worksheet.vercel.app/",
+    name: "YouTube-Arbeitsblatt",
+    tagline: "Aus einem Video wird ein Arbeitsblatt",
+    accent: "var(--a-red)",
+    icon: "display",
+  },
+  {
+    url: "https://ewhgen3.vercel.app/",
+    name: "Erwartungshorizont",
+    tagline: "Bewertungsraster zu einer Klausur",
+    accent: "var(--a-violet)",
+    icon: "grades",
+  },
+  {
+    url: "https://examcollection.vercel.app/",
+    name: "Klausursammlung",
+    tagline: "Klausuren ablegen und wiederfinden",
+    accent: "var(--a-blue)",
+    icon: "board",
+  },
+  {
+    url: "https://lmgvocab.vercel.app/",
+    name: "Vokabeltrainer",
+    tagline: "Vokabeln üben, Klasse für Klasse",
+    accent: "var(--a-teal)",
+    icon: "people",
+  },
+  {
+    url: "https://lmgcode.vercel.app/",
+    name: "LMG Code",
+    tagline: "Programmieren im Browser",
+    accent: "var(--a-orange)",
+    icon: "grid",
+  },
+];

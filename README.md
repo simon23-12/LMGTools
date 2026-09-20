@@ -2,7 +2,8 @@
 
 **Live: <https://simon23-12.github.io/LMGTools/>**
 
-Werkzeuge für den Unterricht am Lessing-Gymnasium — Timer, Lautstärke-Ampel,
+Werkzeuge für den Unterricht am Leibniz-Montessori-Gymnasium Düsseldorf —
+Timer, Lautstärke-Ampel,
 Gruppeneinteilung, Sitzplan und mehr, im Corporate Design der Schule.
 
 **Alles läuft im Browser.** Kein Server, keine Datenbank, keine Anmeldung.
