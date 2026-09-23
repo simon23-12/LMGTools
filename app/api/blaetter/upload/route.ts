@@ -11,9 +11,9 @@ import { aufraeumen } from "@/lib/blaetter-server";
  * Gibt einen Upload direkt vom Browser zu Vercel Blob frei. Die Datei
  * selbst laeuft nicht durch diese Funktion — nur die Erlaubnis dafuer.
  *
- * Es gibt kein Passwort; die Seite ist nur nicht verlinkt. Damit
- * niemand den Speicher vollmacht, liegen hoechstens MAX_GLEICHZEITIG
- * gueltige Blaetter gleichzeitig im Store, jedes hoechstens 25 MB.
+ * Es gibt kein Passwort. Damit niemand den Speicher vollmacht, liegen
+ * hoechstens MAX_GLEICHZEITIG gueltige Blaetter gleichzeitig im Store,
+ * jedes hoechstens 25 MB.
  */
 export async function POST(request: Request) {
   const body = (await request.json()) as HandleUploadBody;

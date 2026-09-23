@@ -103,6 +103,14 @@ export const TOOLS: Tool[] = [
     icon: "board",
   },
   {
+    slug: "blaetter",
+    name: "Arbeitsblätter",
+    tagline: "Bis zu vier Blätter per QR-Code aufs iPad",
+    category: "Beamer",
+    accent: "var(--a-teal)",
+    icon: "qr",
+  },
+  {
     slug: "sitzplan",
     name: "Sitzplan",
     tagline: "Ziehen, ablegen, auslosen",

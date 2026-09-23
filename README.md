@@ -1,6 +1,6 @@
 # LMG Classroom Tools
 
-**Live:** auf Vercel (Adresse nach dem Umzug hier eintragen)
+**Live: <https://lmg-tools.vercel.app/>**
 
 Werkzeuge für den Unterricht am Leibniz-Montessori-Gymnasium Düsseldorf —
 Timer, Lautstärke-Ampel,
@@ -8,8 +8,8 @@ Gruppeneinteilung, Sitzplan und mehr, im Corporate Design der Schule.
 
 **Fast alles läuft im Browser.** Klassenlisten und Einstellungen liegen
 ausschließlich im `localStorage` des jeweiligen Geräts und werden nirgendwohin
-übertragen. Die einzige Ausnahme sind die Arbeitsblätter unter `/blaetter` (nicht
-verlinkt, siehe unten): Die Dateien liegen für 90 Minuten in Vercel Blob.
+übertragen. Die einzige Ausnahme sind die Arbeitsblätter unter `/blaetter` (siehe
+unten): Die Dateien liegen für 90 Minuten in Vercel Blob.
 
 ## Loslegen
 
@@ -36,6 +36,7 @@ Dann <http://localhost:3000> öffnen.
 | `/sitzplan` | Sitzplan per Antippen, zufällig verteilbar, pro Klasse gespeichert |
 | `/dienste` | Dienste rotieren automatisch nach Kalenderwoche |
 | `/noten` | Punkte zu Note für Oberstufe und Sek I, dazu der volle Punkteschlüssel zum Ausdrucken |
+| `/blaetter` | Bis zu vier Arbeitsblätter hochladen, neben jedem ein QR-Code für die iPads. Nach 90 Minuten ist der Link tot und die Datei wird gelöscht |
 | `/klassen` | Klassenlisten anlegen und pflegen, mit Export und Import als Datei |
 
 ### Rollen in der Gruppenarbeit
@@ -95,11 +96,9 @@ einsetzen — alles andere referenziert nur diese Komponente.
 
 ## Arbeitsblätter per QR-Code
 
-`/blaetter` steht absichtlich **nicht** auf der Startseite und hat keinen
-Rückweg dorthin. Wer die Adresse kennt, kann bis zu vier Dateien (PDF oder
-Bild, je höchstens 25 MB) hochladen. Neben jedem Blatt steht ein QR-Code für
-die iPads. Ein Passwort gibt es nicht; die Seite ist für Suchmaschinen
-gesperrt (`noindex`).
+Unter `/blaetter` lassen sich bis zu vier Dateien (PDF oder Bild, je
+höchstens 25 MB) hochladen. Neben jedem Blatt steht ein QR-Code für die
+iPads. Ein Passwort gibt es nicht.
 
 Der Upload geht direkt vom Browser zu Vercel Blob; `app/api/blaetter/upload`
 gibt ihn frei. Jede Datei liegt unter `blaetter/<Upload-Zeitpunkt>/<Name>`.

@@ -20,20 +20,14 @@ export function ToolShell({
   children,
   hint,
   bleed = false,
-  eigenstaendig,
 }: {
   slug: string;
   children: ReactNode;
   hint?: ReactNode;
   /** true = Inhalt fuellt den Bildschirm (Timer, Ampel, Anzeige) */
   bleed?: boolean;
-  /**
-   * Fuer Seiten, die nicht in der Registry stehen und nicht zur
-   * Startseite zurueckfuehren sollen (etwa /blaetter).
-   */
-  eigenstaendig?: { name: string; accent: string };
 }) {
-  const tool = eigenstaendig ?? toolBySlug(slug);
+  const tool = toolBySlug(slug);
   const { isFullscreen, toggle } = useFullscreen();
   const [ruht, setRuht] = useState(false);
 
@@ -71,22 +65,18 @@ export function ToolShell({
         }`}
       >
         <div className="mx-auto flex h-16 w-full max-w-[1500px] items-center gap-3 px-4 sm:px-6">
-          {eigenstaendig ? null : (
-            <>
-              <Link
-                href="/"
-                className="grid size-10 shrink-0 place-items-center rounded-xl text-muted transition hover:bg-surface-2 hover:text-ink"
-                aria-label="Zur Übersicht"
-                title="Zur Übersicht"
-              >
-                <Icon name="back" size={20} />
-              </Link>
+          <Link
+            href="/"
+            className="grid size-10 shrink-0 place-items-center rounded-xl text-muted transition hover:bg-surface-2 hover:text-ink"
+            aria-label="Zur Übersicht"
+            title="Zur Übersicht"
+          >
+            <Icon name="back" size={20} />
+          </Link>
 
-              <Link href="/" className="hidden shrink-0 sm:block" aria-label="LMG">
-                <LmgMark size={26} />
-              </Link>
-            </>
-          )}
+          <Link href="/" className="hidden shrink-0 sm:block" aria-label="LMG">
+            <LmgMark size={26} />
+          </Link>
 
           <div className="min-w-0 flex-1">
             <h1 className="truncate font-display text-lg font-bold">

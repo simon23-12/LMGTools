@@ -22,13 +22,9 @@ import {
    Die Lehrkraft laedt bis zu vier Dateien hoch, neben jedem Blatt
    steht ein QR-Code. Die iPads scannen und oeffnen das PDF. Nach 90
    Minuten fuehrt der Code ins Leere, und die Datei wird geloescht.
-
-   Die Seite steht bewusst nicht auf der Startseite und fuehrt auch
-   nicht dorthin zurueck: Wer den Link nicht kennt, findet sie nicht.
-   Ein Passwort gibt es deshalb nicht.
+   Ein Passwort gibt es nicht; gegen Missbrauch begrenzt der Server
+   die Zahl gleichzeitig gespeicherter Blaetter.
 ----------------------------------------------------------------- */
-
-const SHELL = { name: "Arbeitsblätter", accent: "var(--a-teal)" };
 
 type Blatt = {
   url: string;
@@ -143,7 +139,6 @@ export default function BlaetterPage() {
   return (
     <ToolShell
       slug="blaetter"
-      eigenstaendig={SHELL}
       bleed
       hint={
         <>
