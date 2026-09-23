@@ -1,14 +1,15 @@
 # LMG Classroom Tools
 
-**Live: <https://simon23-12.github.io/LMGTools/>**
+**Live:** auf Vercel (Adresse nach dem Umzug hier eintragen)
 
 Werkzeuge für den Unterricht am Leibniz-Montessori-Gymnasium Düsseldorf —
 Timer, Lautstärke-Ampel,
 Gruppeneinteilung, Sitzplan und mehr, im Corporate Design der Schule.
 
-**Alles läuft im Browser.** Kein Server, keine Datenbank, keine Anmeldung.
-Klassenlisten und Einstellungen liegen ausschließlich im `localStorage` des
-jeweiligen Geräts und werden nirgendwohin übertragen.
+**Fast alles läuft im Browser.** Klassenlisten und Einstellungen liegen
+ausschließlich im `localStorage` des jeweiligen Geräts und werden nirgendwohin
+übertragen. Die einzige Ausnahme sind die Arbeitsblätter unter `/blaetter` (nicht
+verlinkt, siehe unten): Die Dateien liegen für 90 Minuten in Vercel Blob.
 
 ## Loslegen
 
@@ -74,7 +75,8 @@ verpackt. Startseite, Suche und Favoriten ziehen sich den Rest selbst.
 
 ## Datenschutz
 
-- Keine Schülerdaten auf einem Server — es gibt keinen.
+- Keine Schülerdaten auf einem Server. Auf Vercel liegen nur hochgeladene
+  Arbeitsblätter, und die nur für 90 Minuten.
 - In den Klassenlisten stehen nur Vornamen.
 - Die Ampel berechnet aus dem Mikrofonsignal ausschließlich die Lautstärke.
   Es wird nichts aufgezeichnet, gespeichert oder gesendet.
@@ -91,28 +93,38 @@ dafür Export und Import als Datei.
 Sprechblasen. Liegt die offizielle Logodatei vor, lässt sie sich dort
 einsetzen — alles andere referenziert nur diese Komponente.
 
+## Arbeitsblätter per QR-Code
+
+`/blaetter` steht absichtlich **nicht** auf der Startseite und hat keinen
+Rückweg dorthin. Wer die Adresse kennt, kann bis zu vier Dateien (PDF oder
+Bild, je höchstens 25 MB) hochladen. Neben jedem Blatt steht ein QR-Code für
+die iPads. Ein Passwort gibt es nicht; die Seite ist für Suchmaschinen
+gesperrt (`noindex`).
+
+Der Upload geht direkt vom Browser zu Vercel Blob; `app/api/blaetter/upload`
+gibt ihn frei. Jede Datei liegt unter `blaetter/<Upload-Zeitpunkt>/<Name>`.
+Damit niemand ohne Passwort den Speicher vollmacht, liegen höchstens 40
+gültige Blätter gleichzeitig im Store.
+
+Der QR-Code zeigt nicht auf die Datei selbst, sondern auf `/blatt/…`. Diese
+Route leitet zur Datei weiter, solange die 90 Minuten laufen, und meldet
+danach „abgelaufen“. Vercel Blob kennt kein Ablaufdatum; gelöscht wird bei
+jedem neuen Upload und zusätzlich einmal täglich per Cron (`vercel.json`).
+Vorzeitig löschen lässt sich nichts — „Ausblenden“ nimmt ein Blatt nur vom
+Bildschirm. Sonst könnte jeder, der einen QR-Code gescannt hat, auch löschen.
+
+Umgebungsvariablen bei Vercel:
+
+| Variable | Woher |
+| --- | --- |
+| `BLOB_READ_WRITE_TOKEN` | Entsteht mit dem Blob-Store `lmg-blaetter` (Frankfurt, öffentlich) |
+| `CRON_SECRET` | Optional, schützt den Aufräum-Cron |
+
+Lokal testen: `vercel env pull .env.local`, dann `npm run dev`.
+
 ## Bauen und Veröffentlichen
 
-```bash
-npm run build
-```
-
-`output: "export"` erzeugt nach `out/` reines HTML, CSS und JavaScript —
-keine Functions, keine Datenbank, nichts, was einen Node-Server bräuchte.
-
-### GitHub Pages
-
-Jeder Push auf `main` startet den Workflow in
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), der den
-Export baut und veröffentlicht. Es ist kein Handgriff nötig; im Actions-Tab
-lässt sich der Lauf auch von Hand auslösen.
-
-Weil die Seite unter `/LMGTools/` liegt und nicht in der Wurzel, braucht
-Next.js einen Basispfad. Der kommt aus `NEXT_PUBLIC_BASE_PATH` und wird im
-Workflow aus dem Repository-Namen gebildet — ein Umbenennen des Repositorys
-passt sich also von selbst an. Lokal ist die Variable leer, `npm run dev`
-läuft deshalb weiter unter `http://localhost:3000/`.
-
-Zwei Fälle, in denen der Basispfad **leer** sein muss: eine eigene Domain
-(CNAME) oder ein Repository mit dem Namen `simon23-12.github.io`. Dann in
-`.github/workflows/deploy.yml` die Zeile `NEXT_PUBLIC_BASE_PATH` entfernen.
+Jeder Push auf `main` wird von Vercel gebaut und veröffentlicht, sobald das
+Repository dort als Projekt verbunden ist. Fast alle Seiten sind weiterhin
+statisch vorgerendert; nur die Routen unter `app/api/blaetter` und
+`app/blatt` laufen als Functions.

@@ -239,6 +239,24 @@ const PATHS: Record<string, React.ReactNode> = {
       <path d="m7.4 16.6-3.15 3.15" />
     </>
   ),
+  qr: (
+    <>
+      <rect x="3.75" y="3.75" width="6.5" height="6.5" rx="1.25" />
+      <rect x="13.75" y="3.75" width="6.5" height="6.5" rx="1.25" />
+      <rect x="3.75" y="13.75" width="6.5" height="6.5" rx="1.25" />
+      <path d="M13.75 13.75h2.5v2.5" />
+      <path d="M20.25 13.75v2.5" />
+      <path d="M13.75 20.25h6.5v-2" />
+      <path d="M16.25 18.25v2" />
+    </>
+  ),
+  upload: (
+    <>
+      <path d="M12 15.25V3.75" />
+      <path d="m7.5 8.25 4.5-4.5 4.5 4.5" />
+      <path d="M4.25 14.5v4.25a1.5 1.5 0 0 0 1.5 1.5h12.5a1.5 1.5 0 0 0 1.5-1.5V14.5" />
+    </>
+  ),
   external: (
     <>
       <path d="M13.5 4.25h6.25v6.25" />
