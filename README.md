@@ -36,7 +36,7 @@ Dann <http://localhost:3000> öffnen.
 | `/sitzplan` | Sitzplan per Antippen, zufällig verteilbar, pro Klasse gespeichert |
 | `/dienste` | Dienste rotieren automatisch nach Kalenderwoche |
 | `/noten` | Punkte zu Note für Oberstufe und Sek I, dazu der volle Punkteschlüssel zum Ausdrucken |
-| `/blaetter` | Bis zu vier Arbeitsblätter hochladen, neben jedem ein QR-Code für die iPads. Nach 90 Minuten ist der Link tot und die Datei wird gelöscht |
+| `/blaetter` | Bis zu sechs Arbeitsblätter hochladen, neben jedem ein QR-Code für die iPads. Nach 90 Minuten ist der Link tot und die Datei wird gelöscht |
 | `/klassen` | Klassenlisten anlegen und pflegen, mit Export und Import als Datei |
 
 ### Rollen in der Gruppenarbeit
@@ -96,7 +96,7 @@ einsetzen — alles andere referenziert nur diese Komponente.
 
 ## Arbeitsblätter per QR-Code
 
-Unter `/blaetter` lassen sich bis zu vier Dateien (PDF oder Bild, je
+Unter `/blaetter` lassen sich bis zu sechs Dateien (PDF oder Bild, je
 höchstens 25 MB) hochladen. Neben jedem Blatt steht ein QR-Code für die
 iPads. Ein Passwort gibt es nicht.
 

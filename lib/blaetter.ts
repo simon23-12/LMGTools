@@ -8,7 +8,7 @@
  */
 
 export const LAUFZEIT_MS = 90 * 60 * 1000;
-export const MAX_BLAETTER = 4;
+export const MAX_BLAETTER = 6;
 export const MAX_BYTES = 25 * 1024 * 1024;
 /** Obergrenze ueber alle Geraete — bremst Missbrauch ohne Passwort. */
 export const MAX_GLEICHZEITIG = 40;

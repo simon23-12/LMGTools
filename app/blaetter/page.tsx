@@ -19,7 +19,7 @@ import {
 
 /* ---------------------------------------------------------------
    Arbeitsblaetter
-   Die Lehrkraft laedt bis zu vier Dateien hoch, neben jedem Blatt
+   Die Lehrkraft laedt bis zu sechs Dateien hoch, neben jedem Blatt
    steht ein QR-Code. Die iPads scannen und oeffnen das PDF. Nach 90
    Minuten fuehrt der Code ins Leere, und die Datei wird geloescht.
    Ein Passwort gibt es nicht; gegen Missbrauch begrenzt der Server
@@ -132,9 +132,10 @@ export default function BlaetterPage() {
 
   const zeigen = modus === "zeigen";
   const anzahl = aktiv.length + (zeigen ? 0 : laeuft.length + (frei > 0 ? 1 : 0));
-  // Zwei Spalten ab zwei Blaettern: So bleiben Titel und QR-Code
-  // nebeneinander gross genug, auch bei vier Blaettern im 2x2-Raster.
-  const spalten = anzahl <= 1 ? "lg:grid-cols-1" : "lg:grid-cols-2";
+  // Bis vier Blaetter zwei Spalten (2x2), ab fuenf drei Spalten (3x2):
+  // So passen alle auf einen Beamer-Bildschirm, ohne zu scrollen.
+  const spalten =
+    anzahl <= 1 ? "lg:grid-cols-1" : anzahl <= 4 ? "lg:grid-cols-2" : "lg:grid-cols-3";
 
   return (
     <ToolShell
@@ -222,6 +223,7 @@ export default function BlaetterPage() {
                 blatt={blatt}
                 now={now}
                 zeigen={zeigen}
+                kompakt={anzahl > 4}
                 onTitel={(t) => umbenennen(blatt.url, t)}
                 onAusblenden={() => ausblenden([blatt.url])}
                 onGross={() => setGross(blatt)}
@@ -307,6 +309,7 @@ function BlattKarte({
   blatt,
   now,
   zeigen,
+  kompakt,
   onTitel,
   onAusblenden,
   onGross,
@@ -315,6 +318,8 @@ function BlattKarte({
   blatt: Blatt;
   now: number;
   zeigen: boolean;
+  /** Drei Spalten: kleinere Titel, damit Woerter nicht zerbrechen. */
+  kompakt: boolean;
   onTitel: (titel: string) => void;
   onAusblenden: () => void;
   onGross: () => void;
@@ -334,7 +339,10 @@ function BlattKarte({
         {zeigen ? (
           <h2
             className="font-display leading-tight font-bold text-balance"
-            style={{ fontSize: "clamp(1.4rem, 2.6vw, 2.6rem)", hyphens: "auto" }}
+            style={{
+              fontSize: kompakt ? "clamp(1.2rem, 1.7vw, 2rem)" : "clamp(1.4rem, 2.6vw, 2.6rem)",
+              hyphens: "auto",
+            }}
           >
             {blatt.titel || `Blatt ${nummer}`}
           </h2>

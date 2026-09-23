@@ -105,7 +105,7 @@ export const TOOLS: Tool[] = [
   {
     slug: "blaetter",
     name: "Arbeitsblätter",
-    tagline: "Bis zu vier Blätter per QR-Code aufs iPad",
+    tagline: "Bis zu sechs Blätter per QR-Code aufs iPad",
     category: "Beamer",
     accent: "var(--a-teal)",
     icon: "qr",
