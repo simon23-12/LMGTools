@@ -111,6 +111,14 @@ export const TOOLS: Tool[] = [
     icon: "qr",
   },
   {
+    slug: "qr-link",
+    name: "Link als QR-Code",
+    tagline: "Adresse eintippen, an die Wand, scannen",
+    category: "Beamer",
+    accent: "var(--a-blue)",
+    icon: "link",
+  },
+  {
     slug: "sitzplan",
     name: "Sitzplan",
     tagline: "Ziehen, ablegen, auslosen",
