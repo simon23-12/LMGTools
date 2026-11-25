@@ -8,8 +8,10 @@ Gruppeneinteilung, Sitzplan und mehr, im Corporate Design der Schule.
 
 **Fast alles läuft im Browser.** Klassenlisten und Einstellungen liegen
 ausschließlich im `localStorage` des jeweiligen Geräts und werden nirgendwohin
-übertragen. Die einzige Ausnahme sind die Arbeitsblätter unter `/blaetter` (siehe
-unten): Die Dateien liegen für 90 Minuten in Vercel Blob.
+übertragen. Ausnahmen sind die Arbeitsblätter unter `/blaetter` (die Dateien
+liegen für 90 Minuten in Vercel Blob) und die Galerie unter `/galerie` (Vornamen
+der Plätze und die abgelegten Dateien liegen in Vercel Blob, bis die Wand
+gelöscht wird). Beides steht unten.
 
 ## Loslegen
 
@@ -37,6 +39,7 @@ Dann <http://localhost:3000> öffnen.
 | `/dienste` | Dienste rotieren automatisch nach Kalenderwoche |
 | `/noten` | Punkte zu Note für Oberstufe und Sek I, dazu der volle Punkteschlüssel zum Ausdrucken |
 | `/blaetter` | Bis zu sechs Arbeitsblätter hochladen, neben jedem ein QR-Code für die iPads. Nach 90 Minuten ist der Link tot und die Datei wird gelöscht |
+| `/galerie` | Eine Wand mit bis zu 32 Plätzen. Die Klasse scannt den QR-Code, tippt den eigenen Namen an und legt Bilder oder PDFs ab. Plätze aus einem Kurs füllen oder von Hand benennen |
 | `/klassen` | Klassenlisten anlegen und pflegen, mit Export und Import als Datei |
 
 ### Rollen in der Gruppenarbeit
@@ -76,9 +79,12 @@ verpackt. Startseite, Suche und Favoriten ziehen sich den Rest selbst.
 
 ## Datenschutz
 
-- Keine Schülerdaten auf einem Server. Auf Vercel liegen nur hochgeladene
-  Arbeitsblätter, und die nur für 90 Minuten.
-- In den Klassenlisten stehen nur Vornamen.
+- Auf Vercel liegen nur hochgeladene Arbeitsblätter (90 Minuten) und die
+  Galerie-Wände: deren Platznamen (Vornamen) in einem privaten Store, die
+  abgelegten Dateien öffentlich unter einer nicht erratbaren Adresse — bis
+  die Wand gelöscht wird.
+- In den Klassenlisten stehen nur Vornamen. Die Listen selbst verlassen das
+  Gerät nie; in die Galerie gehen nur die Namen, die dort einen Platz bekommen.
 - Die Ampel berechnet aus dem Mikrofonsignal ausschließlich die Lautstärke.
   Es wird nichts aufgezeichnet, gespeichert oder gesendet.
 - Kein Tracking, keine Cookies, keine Einbindung von Drittanbietern.
@@ -121,9 +127,45 @@ Umgebungsvariablen bei Vercel:
 
 Lokal testen: `vercel env pull .env.local`, dann `npm run dev`.
 
+## Galerie
+
+Unter `/galerie` legt die Lehrkraft eine Wand mit 1 bis 32 Plätzen an —
+entweder aus einem Kurs (jeder Name ein Platz) oder leer, dann werden die
+Namen direkt auf der Wand eingetragen. „Namen aus Kurs …“ legt die Namen
+eines Kurses nachträglich der Reihe nach auf die Plätze. Der QR-Code steht
+auf der Wand selbst und führt zu `/abgabe/?w=<wand>`. Dort tippt man den
+eigenen Namen an und legt Bilder oder PDFs ab, per Antippen oder Ziehen.
+
+- **Grenzen:** je Platz 10 Dateien und 10 MB, je Wand 200 MB, höchstens 4
+  Wände gleichzeitig (`lib/galerie.ts`). So bleibt alles sicher unter dem
+  1 GB des Free-Tiers — wird das gerissen, sperrt Vercel Blob 30 Tage, auch
+  für die Arbeitsblätter. Fotos werden auf dem iPad vor dem Hochladen auf
+  2400 px verkleinert. Präsentationen nur als PDF.
+- **Wer darf was:** Wer eine Wand anlegt, bekommt einen Schlüssel, der nur
+  im Browser liegt. Nur damit lassen sich Plätze ändern, fremde Dateien
+  löschen und die Wand löschen. „Lehrerlink“ kopiert einen Link mit dem
+  Schlüssel, um die Wand auf einem anderen Rechner zu verwalten. Ein iPad
+  darf nur die Dateien löschen, die es selbst hochgeladen hat.
+- **Speicher:** Die Dateien liegen im öffentlichen Store `lmg-blaetter` unter
+  `galerie/<wand>/<platz>/`. Die Inhaltsliste jeder Wand (`wand.json`) liegt
+  im privaten Store `lmg-galerie` — nur dort liest Vercel Blob garantiert
+  frisch am CDN vorbei. Ändern viele iPads gleichzeitig, schreibt der Server
+  nur, wenn sich die Liste seit dem Lesen nicht geändert hat (ETag), sonst
+  liest er neu.
+- **Abfragen:** Die Beamer-Ansicht fragt alle 12 Sekunden nach, nur solange
+  der Tab sichtbar ist. Unverändert antwortet der Server mit 304, ohne die
+  Liste zu laden. Ein Upload kostet zwei „Advanced Operations“ (Datei und
+  Liste), das Anlegen einer Wand eine weitere.
+- Nichts läuft ab: Eine Wand bleibt, bis sie gelöscht wird. Das Löschen
+  räumt die Dateien und die Liste vollständig weg.
+
+| Variable | Woher |
+| --- | --- |
+| `GALERIE_READ_WRITE_TOKEN` | Entsteht mit dem Blob-Store `lmg-galerie` (Frankfurt, privat) |
+
 ## Bauen und Veröffentlichen
 
 Jeder Push auf `main` wird von Vercel gebaut und veröffentlicht, sobald das
 Repository dort als Projekt verbunden ist. Fast alle Seiten sind weiterhin
-statisch vorgerendert; nur die Routen unter `app/api/blaetter` und
-`app/blatt` laufen als Functions.
+statisch vorgerendert; nur die Routen unter `app/api/blaetter`,
+`app/api/galerie` und `app/blatt` laufen als Functions.

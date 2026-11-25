@@ -119,6 +119,14 @@ export const TOOLS: Tool[] = [
     icon: "link",
   },
   {
+    slug: "galerie",
+    name: "Galerie",
+    tagline: "Bis zu 32 Plätze, die Klasse legt Bilder und PDFs ab",
+    category: "Beamer",
+    accent: "var(--a-pink)",
+    icon: "grid",
+  },
+  {
     slug: "sitzplan",
     name: "Sitzplan",
     tagline: "Ziehen, ablegen, auslosen",
